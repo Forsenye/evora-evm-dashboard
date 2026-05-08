@@ -82,6 +82,10 @@ cd backend
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+Nota:
+
+- El backend habilita CORS para consumo local desde Vite en `http://localhost:5173`, `http://localhost:5174`, `http://127.0.0.1:5173` y `http://127.0.0.1:5174`.
+
 ## Ejecucion frontend
 
 ```bash
@@ -236,6 +240,89 @@ cd backend
 pytest tests/unit/test_evm_calculation_service.py
 pytest --cov=app tests/unit/test_evm_calculation_service.py
 ```
+
+## Validacion end-to-end local
+
+### Comandos backend
+
+```bash
+cd backend
+.\.venv\Scripts\python -m pytest
+.\.venv\Scripts\python -m pytest --cov=app
+uvicorn app.main:app --reload
+```
+
+### Comandos frontend
+
+```bash
+cd frontend
+npm install
+npm run build
+npm run lint
+```
+
+### Datos de prueba demo
+
+Proyecto:
+
+- `Implementacion EVORA`
+
+Actividades:
+
+- `Diseno de base de datos` | BAC `1000000` | planned `50` | actual `40` | AC `600000`
+- `Desarrollo backend` | BAC `1000000` | planned `60` | actual `60` | AC `700000`
+- `Desarrollo frontend` | BAC `1000000` | planned `40` | actual `20` | AC `400000`
+
+Resultados esperados:
+
+- BAC total: `3000000`
+- PV total: `1500000`
+- EV total: `1200000`
+- AC total: `1700000`
+- CV: `-500000`
+- SV: `-300000`
+- CPI aproximado: `0.71`
+- SPI: `0.80`
+- cost_status: `Sobre presupuesto`
+- schedule_status: `Atrasado`
+
+### Checklist de validacion
+
+- [x] Backend tests: `64 passed`
+- [x] Cobertura backend: `96%`
+- [x] FastAPI levantado localmente y validado en `/health`
+- [x] Swagger accesible en `/swagger-ui`
+- [x] OpenAPI accesible en `/api-docs.json`
+- [x] Endpoints de proyectos validados
+- [x] Endpoints de actividades validados
+- [x] Endpoint consolidado EVM validado
+- [x] Caso borde AC=0 retorna CPI `null`
+- [x] Caso borde planned_progress=0 retorna SPI `null`
+- [x] BAC=0 retorna HTTP `422`
+- [x] Porcentajes fuera de rango retornan HTTP `422`
+- [x] Proyecto sin actividades retorna resumen controlado
+- [x] Frontend build exitoso
+- [x] Frontend lint exitoso
+
+Nota:
+
+- El dashboard se valida manualmente iniciando backend y frontend y cargando el proyecto demo para comprobar tabla, tarjetas, badges CPI/SPI y grafica PV/EV/AC.
+
+## Consideraciones de ejecución en entornos corporativos
+
+EVORA está preparado para ejecutarse localmente con backend FastAPI y frontend React/Vite.
+
+En equipos corporativos pueden existir restricciones sobre Shell, ejecución de scripts, instalación de dependencias, uso de puertos locales, acceso del navegador a localhost o comunicación entre frontend y backend por CORS.
+
+Si el entorno bloquea estas acciones, se recomienda ejecutar el MVP en un equipo personal, entorno de laboratorio o ambiente autorizado donde estén permitidos Python, Node.js, npm y navegación local.
+
+No se recomienda modificar políticas de seguridad, firewall, navegador o restricciones corporativas sin autorización.
+
+Validaciones alternativas recomendadas cuando hay restricciones:
+
+- Backend: `cd backend && .\.venv\Scripts\python.exe -m pytest`
+- Frontend (build): `cd frontend && npm run build`
+- Validación funcional completa desde navegador solo en un entorno autorizado que permita localhost y puertos locales.
 
 ## Acceso a Swagger
 
