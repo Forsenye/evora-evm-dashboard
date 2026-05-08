@@ -44,6 +44,40 @@ class ProjectEvmSummary(BaseModel):
     status: EvmStatus
 
 
+class ProjectEvmDashboardSummary(BaseModel):
+    bac: float
+    pv: float
+    ev: float
+    ac: float
+    cv: float
+    sv: float
+    cpi: float | None
+    spi: float | None
+    eac: float | None
+    vac: float | None
+    cost_status: str
+    schedule_status: str
+
+
+class ActivityWithEvmResponse(BaseModel):
+    id: str
+    name: str
+    bac: float
+    planned_progress: float
+    actual_progress: float
+    actual_cost: float
+    evm: ProjectEvmDashboardSummary
+
+
+class ProjectEvmSummaryResponse(BaseModel):
+    project_id: str
+    project_name: str
+    total_activities: int
+    summary: ProjectEvmDashboardSummary
+    activities: list[ActivityWithEvmResponse]
+    status: str | None = None
+
+
 # Backward-compatible aliases for existing imports.
 ActivityIndicators = ActivityEvmIndicators
 ProjectSummary = ProjectEvmSummary
