@@ -910,12 +910,288 @@ Pull Request sugerido:
 Create activity CRUD endpoints
 ```
 
+### Prompt 5
+
+```text
+Usa la skill EVORA MVP Builder.
+
+Estamos en el proyecto EVORA, repositorio evora-evm-dashboard.
+
+Objetivo de esta tarea:
+Implementar el endpoint de resumen EVM consolidado por proyecto usando FastAPI, SQLAlchemy, Pydantic, arquitectura por capas y el servicio EvmCalculationService ya existente.
+
+Rama esperada:
+feature/project-evm-summary
+
+Antes de modificar archivos:
+1. Ejecuta git status.
+2. Ejecuta git branch.
+3. Confirma que estás en feature/project-evm-summary.
+4. Si no estás en esa rama, indícalo y sugiere el comando correcto.
+5. No trabajes directamente sobre main ni develop.
+
+Contexto funcional:
+El desafío técnico solicita calcular indicadores EVM por actividad y de forma consolidada por proyecto. Ya existen CRUD de proyectos, CRUD de actividades y EvmCalculationService. En esta tarea debes implementar el endpoint consolidado del proyecto.
+
+Endpoint requerido:
+
+GET /api/v1/projects/{project_id}/evm-summary
+
+Este endpoint debe:
+1. Validar que el proyecto exista.
+2. Retornar HTTP 404 si el proyecto no existe.
+3. Obtener todas las actividades asociadas al proyecto.
+4. Calcular indicadores EVM por actividad reutilizando EvmCalculationService.
+5. Calcular indicadores consolidados del proyecto reutilizando EvmCalculationService.
+6. Retornar una respuesta clara para el dashboard.
+7. Manejar correctamente proyectos sin actividades.
+
+No implementes frontend en esta tarea.
+No agregues AWS, EC2, autenticación, roles, exportación PDF, exportación Excel ni CI/CD.
+
+Reglas de cálculo consolidado:
+1. No promediar CPI ni SPI de las actividades.
+2. Sumar BAC, PV, EV y AC de todas las actividades.
+3. Calcular CV consolidado como total EV - total AC.
+4. Calcular SV consolidado como total EV - total PV.
+5. Calcular CPI consolidado como total EV / total AC.
+6. Calcular SPI consolidado como total EV / total PV.
+7. Si total AC es 0, CPI debe ser None.
+8. Si total PV es 0, SPI debe ser None.
+9. Si CPI es None o CPI es 0, EAC debe ser None.
+10. Si EAC es None, VAC debe ser None.
+11. Si el proyecto no tiene actividades, retornar totales en 0 y CPI/SPI/EAC/VAC en None.
+
+Respuesta esperada para proyecto con actividades:
+
+{
+  "project_id": "uuid",
+  "project_name": "Implementación EVORA",
+  "total_activities": 3,
+  "summary": {
+    "bac": 3000000,
+    "pv": 1500000,
+    "ev": 1200000,
+    "ac": 1700000,
+    "cv": -500000,
+    "sv": -300000,
+    "cpi": 0.71,
+    "spi": 0.8,
+    "eac": 4225352.11,
+    "vac": -1225352.11,
+    "cost_status": "Sobre presupuesto",
+    "schedule_status": "Atrasado"
+  },
+  "activities": [
+    {
+      "id": "uuid",
+      "name": "Diseño de base de datos",
+      "bac": 1000000,
+      "planned_progress": 50,
+      "actual_progress": 40,
+      "actual_cost": 600000,
+      "evm": {
+        "pv": 500000,
+        "ev": 400000,
+        "cv": -200000,
+        "sv": -100000,
+        "cpi": 0.67,
+        "spi": 0.8,
+        "eac": 1492537.31,
+        "vac": -492537.31,
+        "cost_status": "Sobre presupuesto",
+        "schedule_status": "Atrasado"
+      }
+    }
+  ]
+}
+
+Respuesta esperada para proyecto sin actividades:
+
+{
+  "project_id": "uuid",
+  "project_name": "Proyecto sin actividades",
+  "total_activities": 0,
+  "summary": {
+    "bac": 0,
+    "pv": 0,
+    "ev": 0,
+    "ac": 0,
+    "cv": 0,
+    "sv": 0,
+    "cpi": null,
+    "spi": null,
+    "eac": null,
+    "vac": null,
+    "cost_status": "No calculable",
+    "schedule_status": "No calculable"
+  },
+  "activities": [],
+  "status": "Sin actividades registradas"
+}
+
+Arquitectura obligatoria:
+- La ruta debe vivir en backend/app/routes/project_routes.py.
+- La consulta de proyecto debe usar project_repository.
+- La consulta de actividades debe usar activity_repository.
+- El cálculo debe usar EvmCalculationService.
+- No pongas fórmulas EVM dentro de routes.
+- No pongas lógica de negocio directamente en el controlador.
+- Mantén separación por capas.
+
+Schemas:
+Revisa y ajusta backend/app/schemas/evm_schema.py.
+
+Deben existir o crearse schemas para:
+1. ActivityEvmIndicators.
+2. ActivityWithEvmResponse.
+3. ProjectEvmSummary.
+4. ProjectEvmSummaryResponse.
+
+Si ActivityWithEvmResponse ya existe en activity_schema.py, reutilízalo o impórtalo correctamente. Evita duplicar modelos si ya existen.
+
+Repository:
+Revisa si activity_repository.py ya tiene método para listar actividades por project_id.
+Si existe, reutilízalo.
+Si no existe, crea:
+
+get_activities_by_project
+
+Route:
+Agrega en project_routes.py:
+
+GET /api/v1/projects/{project_id}/evm-summary
+
+Cada endpoint debe incluir:
+1. response_model.
+2. descripción clara para Swagger.
+3. manejo de HTTP 404.
+4. respuesta estructurada para el dashboard.
+5. uso de Depends para obtener sesión de base de datos.
+
+Pruebas de integración:
+Crear o ajustar:
+
+backend/tests/integration/test_project_evm_summary_endpoint.py
+
+Debe incluir pruebas para:
+
+1. get project EVM summary successfully.
+2. return 404 when project does not exist.
+3. return controlled summary when project has no activities.
+4. calculate total BAC correctly.
+5. calculate total PV correctly.
+6. calculate total EV correctly.
+7. calculate total AC correctly.
+8. calculate consolidated CV correctly.
+9. calculate consolidated SV correctly.
+10. calculate consolidated CPI correctly from totals.
+11. calculate consolidated SPI correctly from totals.
+12. verify consolidated CPI/SPI are not calculated as averages.
+13. return CPI None when total AC is zero.
+14. return SPI None when total PV is zero.
+15. include activities with individual EVM indicators in the response.
+16. validate response contract for dashboard.
+
+Las pruebas deben validar números reales.
+
+No crees pruebas vacías.
+No crees pruebas que solo validen que algo retorna algo.
+No dupliques lógica EVM en los tests más allá de valores esperados claros.
+
+Ejemplo de datos para test consolidado:
+
+Proyecto: Implementación EVORA
+
+Actividad 1:
+bac = 1000000
+planned_progress = 50
+actual_progress = 40
+actual_cost = 600000
+
+Actividad 2:
+bac = 1000000
+planned_progress = 60
+actual_progress = 60
+actual_cost = 700000
+
+Actividad 3:
+bac = 1000000
+planned_progress = 40
+actual_progress = 20
+actual_cost = 400000
+
+Totales esperados:
+BAC total = 3000000
+PV total = 1500000
+EV total = 1200000
+AC total = 1700000
+CV total = -500000
+SV total = -300000
+CPI consolidado = 1200000 / 1700000 = 0.705882
+SPI consolidado = 1200000 / 1500000 = 0.8
+EAC consolidado = 3000000 / CPI
+VAC consolidado = 3000000 - EAC
+
+Redondeo:
+Si el servicio ya redondea decimales, respeta la convención existente.
+Si no existe convención, usa round(value, 2) para valores monetarios e índices.
+
+Actualiza README.md:
+Agrega una sección breve:
+
+## Project EVM Summary API
+
+Incluye:
+- endpoint disponible
+- propósito
+- ejemplo de respuesta resumido
+- comando para ejecutar la prueba de integración
+
+Actualiza AI_PROCESS.md:
+1. Agrega este prompt completo como el siguiente prompt cronológico.
+2. Documenta que se implementó el endpoint consolidado del proyecto.
+3. Documenta la decisión de calcular CPI y SPI consolidados desde totales y no desde promedios.
+4. Documenta el manejo de proyecto sin actividades.
+5. Documenta que la lógica EVM se mantuvo centralizada en EvmCalculationService.
+
+Ejecuta pruebas:
+
+cd backend
+pytest tests/integration/test_project_evm_summary_endpoint.py
+
+También ejecuta:
+
+pytest
+
+Al finalizar, reporta:
+1. Rama usada.
+2. Archivos creados.
+3. Archivos modificados.
+4. Resumen técnico.
+5. Endpoint implementado.
+6. Pruebas ejecutadas.
+7. Resultado de pruebas.
+8. Documentación actualizada.
+9. AI_PROCESS actualizado.
+10. Pendientes.
+11. Commit sugerido.
+12. Pull Request sugerido.
+
+Commit sugerido:
+Add project EVM summary endpoint
+
+Pull Request sugerido:
+Add project EVM summary endpoint
+```
+
 ## How I learned EVM
 
 - Se implementaron las fórmulas base de Valor Ganado en `EvmCalculationService` para actividad y consolidado.
 - Se reforzó la diferencia entre métricas por actividad y métricas consolidadas calculadas sobre totales del proyecto.
 - Se implementó el CRUD de proyectos en API REST con prefijo versionado `/api/v1/projects`.
 - Se implementó el CRUD de actividades en API REST y cada respuesta incluye indicadores EVM por actividad.
+- Se implementó el endpoint consolidado `GET /api/v1/projects/{project_id}/evm-summary` para consumo del dashboard.
 
 ## How I validated formulas
 
@@ -923,6 +1199,7 @@ Create activity CRUD endpoints
 - Se incluyeron casos borde para división por cero, progreso real en cero, BAC en cero y proyecto sin actividades.
 - Se agregaron pruebas de integración para crear, listar, consultar, actualizar y eliminar proyectos, incluyendo validaciones 404 y 422.
 - Se agregaron pruebas de integración del CRUD de actividades para validar contrato, reglas 422 y cálculo EVM en respuesta.
+- Se agregaron pruebas de integración para validar cálculos consolidados, contrato de dashboard y manejo de proyecto sin actividades.
 
 ## AI suggestions I did not follow
 
@@ -935,6 +1212,7 @@ Create activity CRUD endpoints
 - Cuando CPI o SPI no son calculables, se retorna `None` para el indicador correspondiente y estado textual `"No calculable"`.
 - Se mantuvo la separación por capas (routes/schemas/repositories/models) y no se agregó lógica de base de datos dentro de routes.
 - La lógica EVM en actividades se reutilizó desde `EvmCalculationService` y no se duplicaron fórmulas en routes.
+- El endpoint consolidado reutiliza `EvmCalculationService` para cálculo por actividad y proyecto, sin duplicar fórmulas en la capa HTTP.
 
 ## Final reflection
 

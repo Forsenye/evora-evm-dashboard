@@ -147,6 +147,48 @@ Swagger:
 
 - `http://localhost:8000/swagger-ui`
 
+## Project EVM Summary API
+
+Endpoint disponible:
+
+- `GET /api/v1/projects/{project_id}/evm-summary`
+
+Propósito:
+
+- Entregar resumen EVM consolidado del proyecto y detalle EVM por actividad para consumo del dashboard.
+
+Ejemplo de respuesta resumido:
+
+```json
+{
+  "project_id": "uuid",
+  "project_name": "Implementacion EVORA",
+  "total_activities": 3,
+  "summary": {
+    "bac": 3000000.0,
+    "pv": 1500000.0,
+    "ev": 1200000.0,
+    "ac": 1700000.0,
+    "cv": -500000.0,
+    "sv": -300000.0,
+    "cpi": 0.71,
+    "spi": 0.8,
+    "eac": 4250000.0,
+    "vac": -1250000.0,
+    "cost_status": "Sobre presupuesto",
+    "schedule_status": "Atrasado"
+  },
+  "activities": []
+}
+```
+
+Prueba de integración:
+
+```bash
+cd backend
+pytest tests/integration/test_project_evm_summary_endpoint.py
+```
+
 ## EVM Calculation Service
 
 - Ubicacion del servicio: `backend/app/services/evm_calculation_service.py`
