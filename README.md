@@ -97,6 +97,18 @@ cd backend
 pytest
 ```
 
+## EVM Calculation Service
+
+- Ubicacion del servicio: `backend/app/services/evm_calculation_service.py`
+- Indicadores calculados: PV, EV, CV, SV, CPI, SPI, EAC y VAC por actividad y consolidados por proyecto.
+- Ejecucion de pruebas unitarias:
+
+```bash
+cd backend
+pytest tests/unit/test_evm_calculation_service.py
+pytest --cov=app tests/unit/test_evm_calculation_service.py
+```
+
 ## Acceso a Swagger
 
 - Swagger UI: `http://localhost:8000/swagger-ui`

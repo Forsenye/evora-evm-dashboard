@@ -2,13 +2,18 @@ from pydantic import BaseModel, Field
 
 
 class EvmInput(BaseModel):
-    bac: float = Field(gt=0)
+    bac: float = Field(ge=0)
     planned_progress: float = Field(ge=0, le=100)
     actual_progress: float = Field(ge=0, le=100)
     actual_cost: float = Field(ge=0)
 
 
-class ActivityIndicators(BaseModel):
+class EvmStatus(BaseModel):
+    cpi_status: str
+    spi_status: str
+
+
+class ActivityEvmIndicators(BaseModel):
     pv: float
     ev: float
     cv: float
@@ -19,9 +24,10 @@ class ActivityIndicators(BaseModel):
     vac: float | None
     cpi_status: str
     spi_status: str
+    status: EvmStatus
 
 
-class ProjectSummary(BaseModel):
+class ProjectEvmSummary(BaseModel):
     activity_count: int
     total_bac: float
     total_pv: float
@@ -35,3 +41,9 @@ class ProjectSummary(BaseModel):
     spi: float | None
     cpi_status: str
     spi_status: str
+    status: EvmStatus
+
+
+# Backward-compatible aliases for existing imports.
+ActivityIndicators = ActivityEvmIndicators
+ProjectSummary = ProjectEvmSummary

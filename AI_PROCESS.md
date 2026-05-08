@@ -276,23 +276,195 @@ After creating the files:
 - Do not push to GitHub.
 ```
 
+### Prompt 2
+
+```text
+Usa la skill EVORA MVP Builder.
+
+Estamos en el proyecto EVORA, repositorio evora-evm-dashboard.
+
+Objetivo de esta tarea:
+Implementar la lógica central de Valor Ganado en el backend mediante el servicio EvmCalculationService y crear pruebas unitarias sólidas para validar los cálculos y los casos borde.
+
+Rama esperada:
+feature/evm-calculation-service
+
+Antes de modificar archivos:
+1. Ejecuta git status.
+2. Ejecuta git branch.
+3. Confirma que estás en feature/evm-calculation-service.
+4. Si no estás en esa rama, indícalo y sugiere el comando correcto.
+
+Archivos principales:
+- backend/app/services/evm_calculation_service.py
+- backend/app/schemas/evm_schema.py
+- backend/tests/unit/test_evm_calculation_service.py
+- AI_PROCESS.md
+- README.md
+
+Implementa el servicio:
+backend/app/services/evm_calculation_service.py
+
+Debe existir una clase:
+
+EvmCalculationService
+
+Con estos métodos:
+
+1. calculate_activity_indicators(activity_input)
+2. calculate_project_summary(activities)
+3. interpret_cpi(cpi)
+4. interpret_spi(spi)
+
+La lógica debe calcular por actividad:
+
+PV = (planned_progress / 100) * BAC
+EV = (actual_progress / 100) * BAC
+CV = EV - AC
+SV = EV - PV
+CPI = EV / AC
+SPI = EV / PV
+EAC = BAC / CPI
+VAC = BAC - EAC
+
+Reglas obligatorias:
+
+1. planned_progress y actual_progress llegan como valores entre 0 y 100.
+2. No dividir por cero.
+3. Si actual_cost es 0, CPI debe ser None.
+4. Si PV es 0, SPI debe ser None.
+5. Si CPI es None o CPI es 0, EAC debe ser None.
+6. Si EAC es None, VAC debe ser None.
+7. Si actual_progress es 0, EV debe ser 0.
+8. Si actual_progress es 0 y actual_cost es mayor que 0, CPI debe ser 0.
+9. Para proyecto sin actividades, retornar resumen controlado con totales en 0 e indicadores no calculables en None.
+10. Para consolidado de proyecto, no promediar CPI ni SPI de actividades.
+11. Para consolidado, sumar BAC, PV, EV y AC; luego calcular CPI, SPI, EAC y VAC sobre los totales.
+
+Interpretación CPI:
+
+- CPI > 1: "Eficiente en costos"
+- CPI == 1: "En presupuesto"
+- CPI < 1: "Sobre presupuesto"
+- CPI is None: "No calculable"
+
+Interpretación SPI:
+
+- SPI > 1: "Adelantado"
+- SPI == 1: "En cronograma"
+- SPI < 1: "Atrasado"
+- SPI is None: "No calculable"
+
+Crea o ajusta schemas en:
+backend/app/schemas/evm_schema.py
+
+Define modelos Pydantic para representar:
+
+1. ActivityEvmIndicators
+2. ProjectEvmSummary
+3. EvmStatus
+
+Usa nombres técnicos claros en inglés.
+
+Crea pruebas unitarias en:
+backend/tests/unit/test_evm_calculation_service.py
+
+Las pruebas deben validar números reales, no solo que una función retorna algo.
+
+Casos mínimos obligatorios:
+
+1. calculate PV correctly.
+2. calculate EV correctly.
+3. calculate CV correctly.
+4. calculate SV correctly.
+5. calculate CPI when actual_cost is greater than zero.
+6. return CPI None when actual_cost is zero.
+7. calculate SPI when PV is greater than zero.
+8. return SPI None when PV is zero.
+9. return EAC when CPI is valid.
+10. return EAC None when CPI is None.
+11. return VAC when EAC is valid.
+12. return VAC None when EAC is None.
+13. handle actual_progress equals zero.
+14. handle project without activities.
+15. calculate consolidated project summary correctly.
+16. verify consolidated CPI and SPI are calculated from totals, not averages.
+17. interpret CPI greater than 1.
+18. interpret CPI equal to 1.
+19. interpret CPI less than 1.
+20. interpret SPI greater than 1.
+21. interpret SPI equal to 1.
+22. interpret SPI less than 1.
+
+Usa pytest.
+
+Ejecuta:
+
+cd backend
+pytest tests/unit/test_evm_calculation_service.py
+
+Si existe configuración de coverage, ejecuta también:
+
+pytest --cov=app tests/unit/test_evm_calculation_service.py
+
+Actualiza README.md con una sección breve:
+
+## EVM Calculation Service
+
+Explica:
+- ubicación del servicio
+- indicadores calculados
+- cómo ejecutar las pruebas unitarias
+
+Actualiza AI_PROCESS.md:
+1. Agrega este prompt completo como el siguiente prompt cronológico.
+2. Documenta que se implementó EvmCalculationService.
+3. Documenta la decisión técnica de no promediar CPI/SPI para el consolidado.
+4. Documenta la decisión de retornar None cuando CPI/SPI no sean calculables.
+
+No agregues:
+- AWS
+- EC2
+- Docker Compose nuevo si no existe
+- autenticación
+- roles
+- frontend
+- endpoints nuevos en esta tarea
+
+Al finalizar, reporta:
+1. Rama usada.
+2. Archivos modificados.
+3. Resumen técnico.
+4. Pruebas ejecutadas.
+5. Resultado de pruebas.
+6. Pendientes.
+7. Commit sugerido.
+
+Commit sugerido:
+
+Add EVM calculation service
+```
+
 ## How I learned EVM
 
-- Pending documentation update during implementation phase.
+- Se implementaron las fórmulas base de Valor Ganado en `EvmCalculationService` para actividad y consolidado.
+- Se reforzó la diferencia entre métricas por actividad y métricas consolidadas calculadas sobre totales del proyecto.
 
 ## How I validated formulas
 
-- Pending documentation update during implementation phase.
+- Se diseñaron pruebas unitarias con valores controlados para PV, EV, CV, SV, CPI, SPI, EAC y VAC.
+- Se incluyeron casos borde para división por cero, progreso real en cero, BAC en cero y proyecto sin actividades.
 
 ## AI suggestions I did not follow
 
-- Pending documentation update during implementation phase.
-- Pending documentation update during implementation phase.
+- No se agregaron endpoints ni cambios de frontend en esta tarea para respetar el alcance solicitado.
+- No se introdujo infraestructura adicional (AWS/EC2/Docker Compose nuevo) para mantener el foco en lógica EVM y pruebas.
 
 ## Independent architecture decision
 
-- Pending documentation update during implementation phase.
+- En el consolidado de proyecto no se promedian CPI ni SPI por actividad; se calcula sobre sumatorias de BAC, PV, EV y AC.
+- Cuando CPI o SPI no son calculables, se retorna `None` para el indicador correspondiente y estado textual `"No calculable"`.
 
 ## Final reflection
 
-- Pending documentation update during implementation phase.
+- La implementación del servicio EVM con pruebas unitarias exhaustivas reduce riesgo funcional y facilita evolución incremental del backend.
