@@ -1,4 +1,10 @@
-from app.schemas.activity_schema import ActivityCreate, ActivityResponse, ActivityUpdate
+from app.schemas.activity_schema import (
+    ActivityCreate,
+    ActivityEvmData,
+    ActivityResponse,
+    ActivityUpdate,
+    ActivityWithEvmResponse,
+)
 from app.schemas.evm_schema import (
     ActivityEvmIndicators,
     ActivityIndicators,
@@ -11,9 +17,11 @@ from app.schemas.project_schema import ProjectCreate, ProjectResponse, ProjectUp
 
 __all__ = [
     "ActivityCreate",
+    "ActivityEvmData",
     "ActivityEvmIndicators",
     "ActivityResponse",
     "ActivityUpdate",
+    "ActivityWithEvmResponse",
     "ActivityIndicators",
     "EvmInput",
     "EvmStatus",
