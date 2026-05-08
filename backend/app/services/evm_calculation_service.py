@@ -1,24 +1,30 @@
-from app.schemas.evm_schema import ActivityIndicators, EvmInput, ProjectSummary
+from app.schemas.evm_schema import (
+    ActivityEvmIndicators,
+    EvmInput,
+    EvmStatus,
+    ProjectEvmSummary,
+)
 
 
 class EvmCalculationService:
     @staticmethod
-    def calculate_activity_indicators(activity: EvmInput) -> ActivityIndicators:
-        pv = (activity.planned_progress / 100) * activity.bac
-        ev = (activity.actual_progress / 100) * activity.bac
-        cv = ev - activity.actual_cost
+    def calculate_activity_indicators(activity_input: EvmInput) -> ActivityEvmIndicators:
+        pv = (activity_input.planned_progress / 100) * activity_input.bac
+        ev = (activity_input.actual_progress / 100) * activity_input.bac
+        cv = ev - activity_input.actual_cost
         sv = ev - pv
 
-        cpi = None if activity.actual_cost == 0 else ev / activity.actual_cost
+        cpi = None if activity_input.actual_cost == 0 else ev / activity_input.actual_cost
         spi = None if pv == 0 else ev / pv
 
-        eac = None
-        vac = None
-        if cpi not in (None, 0):
-            eac = activity.bac / cpi
-            vac = activity.bac - eac
+        eac = None if cpi in (None, 0) else activity_input.bac / cpi
+        vac = None if eac is None else activity_input.bac - eac
 
-        return ActivityIndicators(
+        cpi_status = EvmCalculationService.interpret_cpi(cpi)
+        spi_status = EvmCalculationService.interpret_spi(spi)
+        status = EvmStatus(cpi_status=cpi_status, spi_status=spi_status)
+
+        return ActivityEvmIndicators(
             pv=pv,
             ev=ev,
             cv=cv,
@@ -27,14 +33,17 @@ class EvmCalculationService:
             spi=spi,
             eac=eac,
             vac=vac,
-            cpi_status=EvmCalculationService.interpret_cpi(cpi),
-            spi_status=EvmCalculationService.interpret_spi(spi),
+            cpi_status=cpi_status,
+            spi_status=spi_status,
+            status=status,
         )
 
     @staticmethod
-    def calculate_project_summary(activities: list[EvmInput]) -> ProjectSummary:
+    def calculate_project_summary(activities: list[EvmInput]) -> ProjectEvmSummary:
         if not activities:
-            return ProjectSummary(
+            cpi_status = EvmCalculationService.interpret_cpi(None)
+            spi_status = EvmCalculationService.interpret_spi(None)
+            return ProjectEvmSummary(
                 activity_count=0,
                 total_bac=0.0,
                 total_pv=0.0,
@@ -46,18 +55,14 @@ class EvmCalculationService:
                 total_vac=None,
                 cpi=None,
                 spi=None,
-                cpi_status=EvmCalculationService.interpret_cpi(None),
-                spi_status=EvmCalculationService.interpret_spi(None),
+                cpi_status=cpi_status,
+                spi_status=spi_status,
+                status=EvmStatus(cpi_status=cpi_status, spi_status=spi_status),
             )
 
-        activity_indicators = [
-            EvmCalculationService.calculate_activity_indicators(activity)
-            for activity in activities
-        ]
-
         total_bac = sum(activity.bac for activity in activities)
-        total_pv = sum(indicator.pv for indicator in activity_indicators)
-        total_ev = sum(indicator.ev for indicator in activity_indicators)
+        total_pv = sum((activity.planned_progress / 100) * activity.bac for activity in activities)
+        total_ev = sum((activity.actual_progress / 100) * activity.bac for activity in activities)
         total_ac = sum(activity.actual_cost for activity in activities)
         total_cv = total_ev - total_ac
         total_sv = total_ev - total_pv
@@ -65,13 +70,13 @@ class EvmCalculationService:
         cpi = None if total_ac == 0 else total_ev / total_ac
         spi = None if total_pv == 0 else total_ev / total_pv
 
-        total_eac = None
-        total_vac = None
-        if cpi not in (None, 0):
-            total_eac = total_bac / cpi
-            total_vac = total_bac - total_eac
+        total_eac = None if cpi in (None, 0) else total_bac / cpi
+        total_vac = None if total_eac is None else total_bac - total_eac
 
-        return ProjectSummary(
+        cpi_status = EvmCalculationService.interpret_cpi(cpi)
+        spi_status = EvmCalculationService.interpret_spi(spi)
+
+        return ProjectEvmSummary(
             activity_count=len(activities),
             total_bac=total_bac,
             total_pv=total_pv,
@@ -83,26 +88,27 @@ class EvmCalculationService:
             total_vac=total_vac,
             cpi=cpi,
             spi=spi,
-            cpi_status=EvmCalculationService.interpret_cpi(cpi),
-            spi_status=EvmCalculationService.interpret_spi(spi),
+            cpi_status=cpi_status,
+            spi_status=spi_status,
+            status=EvmStatus(cpi_status=cpi_status, spi_status=spi_status),
         )
 
     @staticmethod
     def interpret_cpi(cpi: float | None) -> str:
         if cpi is None:
-            return "CPI no calculable cuando AC = 0"
+            return "No calculable"
         if cpi > 1:
-            return "eficiencia en costos"
+            return "Eficiente en costos"
         if cpi == 1:
-            return "en presupuesto"
-        return "sobre presupuesto"
+            return "En presupuesto"
+        return "Sobre presupuesto"
 
     @staticmethod
     def interpret_spi(spi: float | None) -> str:
         if spi is None:
-            return "SPI no calculable cuando PV = 0"
+            return "No calculable"
         if spi > 1:
-            return "adelantado"
+            return "Adelantado"
         if spi == 1:
-            return "en cronograma"
-        return "atrasado"
+            return "En cronograma"
+        return "Atrasado"
