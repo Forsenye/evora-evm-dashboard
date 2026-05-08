@@ -1,16 +1,4 @@
-# AI_PROCESS
-
-## Project
-
-EVORA EVM Dashboard
-
-## AI tools used
-
-- Codex (GPT-5)
-
-## Chronological prompts
-
-### Prompt 1
+# Prompt 001 - Create Codex Skill
 
 ```text
 Actuas a senior fullstack software architect and repository setup engineer. 
@@ -275,24 +263,3 @@ After creating the files:
 - Do not install dependencies yet.
 - Do not push to GitHub.
 ```
-
-## How I learned EVM
-
-- Pending documentation update during implementation phase.
-
-## How I validated formulas
-
-- Pending documentation update during implementation phase.
-
-## AI suggestions I did not follow
-
-- Pending documentation update during implementation phase.
-- Pending documentation update during implementation phase.
-
-## Independent architecture decision
-
-- Pending documentation update during implementation phase.
-
-## Final reflection
-
-- Pending documentation update during implementation phase.
