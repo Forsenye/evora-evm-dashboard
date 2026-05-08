@@ -2,6 +2,12 @@
 
 EVORA | Plataforma inteligente para seguimiento de proyectos con Valor Ganado.
 
+## Version del MVP
+
+- `v1.0.0`
+- Tag de release: `v1.0.0`
+- Rama de release: `release/v1.0.0`
+
 ## Stack tecnologico
 
 - Backend: Python 3.11, FastAPI, Pydantic, SQLAlchemy, PostgreSQL, Pytest, Ruff
