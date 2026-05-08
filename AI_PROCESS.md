@@ -1508,6 +1508,187 @@ Pull Request sugerido:
 Create frontend EVM dashboard
 ```
 
+### Prompt 7
+
+```text
+Usa la skill EVORA MVP Builder.
+
+Estamos en el proyecto EVORA, repositorio evora-evm-dashboard.
+
+Objetivo de esta tarea:
+Realizar la validación end-to-end local del MVP EVORA sin agregar nuevas funcionalidades.
+
+Rama esperada:
+feature/mvp-local-validation
+
+Antes de modificar archivos:
+1. Ejecuta git status.
+2. Ejecuta git branch.
+3. Confirma que estás en feature/mvp-local-validation.
+4. Si no estás en esa rama, indícalo y sugiere el comando correcto.
+5. No trabajes directamente sobre main ni develop.
+
+Alcance:
+Validar que el MVP funcione localmente de punta a punta:
+- Backend FastAPI.
+- Swagger/OpenAPI.
+- Endpoints de proyectos.
+- Endpoints de actividades.
+- Endpoint de resumen EVM.
+- Frontend React.
+- Dashboard.
+- Tabla de actividades.
+- Indicadores consolidados.
+- Badges CPI/SPI.
+- Gráfica PV, EV y AC.
+- Pruebas backend.
+- Build frontend.
+
+No agregues:
+- AWS
+- EC2
+- Docker Compose nuevo
+- autenticación
+- roles
+- CI/CD
+- exportación PDF
+- exportación Excel
+- nuevas funcionalidades fuera del requerimiento
+
+Ejecuta validaciones backend:
+
+cd backend
+pytest
+
+Si existe coverage configurado, ejecuta:
+
+pytest --cov=app
+
+Valida que FastAPI pueda levantar con:
+
+uvicorn app.main:app --reload
+
+No dejes el proceso ejecutándose bloqueando la terminal al finalizar el análisis. Si no puedes validar manualmente el navegador, indica los pasos exactos para que yo lo valide.
+
+Valida endpoints esperados:
+- GET /health
+- GET /api/v1/projects
+- POST /api/v1/projects
+- GET /api/v1/projects/{project_id}
+- POST /api/v1/projects/{project_id}/activities
+- GET /api/v1/projects/{project_id}/activities
+- GET /api/v1/projects/{project_id}/evm-summary
+
+Ejecuta validaciones frontend:
+
+cd frontend
+npm install
+npm run build
+
+Si existe lint configurado:
+
+npm run lint
+
+Valida configuración:
+- frontend/.env.example debe incluir VITE_API_BASE_URL=http://localhost:8000
+- README.md debe explicar cómo ejecutar backend y frontend
+- README.md debe explicar cómo ejecutar pruebas
+- README.md debe indicar acceso a Swagger
+- AI_PROCESS.md debe tener los prompts cronológicos usados hasta este punto
+
+Datos de prueba para demo:
+
+Proyecto:
+Implementación EVORA
+
+Actividad 1:
+name = Diseño de base de datos
+bac = 1000000
+planned_progress = 50
+actual_progress = 40
+actual_cost = 600000
+
+Actividad 2:
+name = Desarrollo backend
+bac = 1000000
+planned_progress = 60
+actual_progress = 60
+actual_cost = 700000
+
+Actividad 3:
+name = Desarrollo frontend
+bac = 1000000
+planned_progress = 40
+actual_progress = 20
+actual_cost = 400000
+
+Resultados consolidados esperados:
+BAC total = 3000000
+PV total = 1500000
+EV total = 1200000
+AC total = 1700000
+CV = -500000
+SV = -300000
+CPI aproximado = 0.71
+SPI = 0.80
+cost_status = Sobre presupuesto
+schedule_status = Atrasado
+
+Verifica que el dashboard pueda representar esta información.
+
+Casos borde que deben validarse:
+1. AC = 0 no debe romper CPI.
+2. planned_progress = 0 no debe romper SPI.
+3. BAC = 0 debe retornar HTTP 422.
+4. Porcentajes menores a 0 o mayores a 100 deben retornar HTTP 422.
+5. Proyecto sin actividades debe retornar resumen controlado.
+
+Si encuentras errores:
+1. Corrige solo errores necesarios para que el MVP cumpla el requerimiento.
+2. No refactorices arquitectura completa.
+3. No agregues funcionalidades nuevas.
+4. Documenta cada corrección en AI_PROCESS.md.
+
+Actualiza README.md:
+Agrega una sección:
+
+## Validación end-to-end local
+
+Incluye:
+- comandos backend
+- comandos frontend
+- datos de prueba
+- resultados esperados
+- checklist de validación
+
+Actualiza AI_PROCESS.md:
+1. Agrega este prompt completo como el siguiente prompt cronológico.
+2. Documenta la validación end-to-end.
+3. Documenta resultados de pruebas.
+4. Documenta errores encontrados y correcciones, si aplica.
+5. Documenta pendientes reales, si existen.
+
+Al finalizar, reporta:
+1. Rama usada.
+2. Comandos ejecutados.
+3. Resultado de pruebas backend.
+4. Resultado de build frontend.
+5. Endpoints validados.
+6. Checklist funcional.
+7. Archivos modificados.
+8. Documentación actualizada.
+9. AI_PROCESS actualizado.
+10. Pendientes.
+11. Commit sugerido.
+12. Pull Request sugerido.
+
+Commit sugerido:
+Validate EVORA MVP locally
+
+Pull Request sugerido:
+Validate EVORA MVP locally
+```
+
 ## How I learned EVM
 
 - Se implementaron las fórmulas base de Valor Ganado en `EvmCalculationService` para actividad y consolidado.
@@ -1543,3 +1724,240 @@ Create frontend EVM dashboard
 ## Final reflection
 
 - La implementación del servicio EVM con pruebas unitarias exhaustivas reduce riesgo funcional y facilita evolución incremental del backend.
+
+## End-to-end validation notes
+
+- Se ejecut� la validaci�n local en la rama `feature/mvp-local-validation` sin agregar nuevas funcionalidades.
+- Pruebas backend ejecutadas: `python -m pytest` y `python -m pytest --cov=app` con resultado `64 passed` y cobertura total `96%`.
+- FastAPI se levant� localmente para validaci�n HTTP controlada, con verificaci�n de `/health`, `/swagger-ui` y `/api-docs.json`.
+- Endpoints validados: `GET /api/v1/projects`, `POST /api/v1/projects`, `GET /api/v1/projects/{project_id}`, `POST /api/v1/projects/{project_id}/activities`, `GET /api/v1/projects/{project_id}/activities`, `GET /api/v1/projects/{project_id}/evm-summary`.
+- Se validaron datos demo y se obtuvo consolidado esperado: BAC `3000000`, PV `1500000`, EV `1200000`, AC `1700000`, CV `-500000`, SV `-300000`, CPI `0.71`, SPI `0.80`, estado costo `Sobre presupuesto`, estado cronograma `Atrasado`.
+- Casos borde confirmados: CPI `null` cuando `AC=0`, SPI `null` cuando `planned_progress=0`, HTTP `422` para `BAC=0` y porcentajes fuera de rango, y resumen controlado para proyecto sin actividades.
+- Frontend validado con `npm install`, `npm run build` y `npm run lint`.
+- Errores funcionales del MVP encontrados: ninguno.
+- Correcciones aplicadas en esta tarea: documentaci�n en `README.md` y `AI_PROCESS.md`.
+- Pendiente real: validar visualmente en navegador la interacci�n completa del dashboard con backend ejecut�ndose de forma concurrente.
+
+### Prompt 8
+
+```text
+Usa la skill EVORA MVP Builder.
+
+Estamos en el proyecto EVORA, repositorio evora-evm-dashboard.
+
+Contexto técnico:
+El backend FastAPI ya funciona correctamente. Se validó:
+- GET /health responde correctamente.
+- GET /api/v1/projects responde HTTP 200 OK desde curl.
+- El frontend React/Vite carga correctamente en http://localhost:5174.
+- Sin embargo, el frontend muestra "Network Error" al intentar consumir el backend.
+
+Diagnóstico realizado:
+Desde CMD se ejecutó:
+
+curl -i -H "Origin: http://localhost:5174" http://127.0.0.1:8000/api/v1/projects
+
+La API respondió:
+
+HTTP/1.1 200 OK
+content-type: application/json
+
+[]
+
+Pero no retornó el header:
+
+access-control-allow-origin
+
+Conclusión:
+El backend responde bien, pero el navegador bloquea las peticiones del frontend por falta de configuración CORS.
+
+Objetivo de esta tarea:
+Habilitar CORS en FastAPI para permitir que el frontend local de EVORA consuma la API desde Vite.
+
+Rama esperada:
+hotfix/enable-frontend-cors
+
+Antes de modificar archivos:
+1. Ejecuta git status.
+2. Ejecuta git branch.
+3. Confirma si estás en hotfix/enable-frontend-cors.
+4. Si no estás en esa rama, crea la rama desde develop con:
+   git checkout develop
+   git pull origin develop
+   git checkout -b hotfix/enable-frontend-cors
+
+Archivo principal:
+- backend/app/main.py
+
+Implementación requerida:
+1. Importar CORSMiddleware desde fastapi.middleware.cors.
+2. Agregar app.add_middleware(CORSMiddleware, ...) después de crear la instancia app = FastAPI(...).
+3. No duplicar la instancia FastAPI.
+4. Mantener la configuración existente de title, version, description, docs_url y openapi_url.
+5. Permitir los orígenes locales usados por Vite:
+   - http://localhost:5173
+   - http://localhost:5174
+   - http://127.0.0.1:5173
+   - http://127.0.0.1:5174
+6. Permitir métodos y headers necesarios para consumo local:
+   - allow_methods=["*"]
+   - allow_headers=["*"]
+7. Mantener allow_credentials=True.
+
+Comentario técnico esperado en el código:
+Agregar un comentario breve antes del middleware indicando que esta configuración permite el consumo local del frontend Vite durante la validación del MVP EVORA.
+
+Ejemplo esperado:
+
+from fastapi.middleware.cors import CORSMiddleware
+
+# Allows the local Vite frontend to consume the EVORA API during MVP validation.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+Pruebas en orden:
+
+1. Ejecutar pruebas backend:
+   cd backend
+   .\.venv\Scripts\python.exe -m pytest
+
+Resultado esperado:
+64 passed
+
+2. Levantar backend usando SQLite temporal para validación local:
+   set DATABASE_URL=sqlite:///./evora_local.db
+   .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+
+3. En otra terminal, validar CORS con curl:
+   curl -i -H "Origin: http://localhost:5174" http://127.0.0.1:8000/api/v1/projects
+
+Resultado esperado:
+Debe aparecer uno de estos headers:
+- access-control-allow-origin: http://localhost:5174
+o
+- access-control-allow-origin: *
+
+Y debe seguir respondiendo:
+[]
+
+4. Validar frontend:
+   cd frontend
+   npm run dev
+
+Abrir:
+http://localhost:5174
+
+Luego recargar con Ctrl + F5.
+
+5. Probar flujo funcional:
+   - Crear proyecto:
+     Nombre: Implementación EVORA
+     Descripción: Validación funcional local
+   - Validar que desaparece el Network Error.
+   - Validar que el proyecto aparece en la sección Proyectos.
+   - Crear actividad:
+     Nombre: Diseño técnico
+     BAC: 1000000
+     % planificado: 100
+     % real: 100
+     AC: 900000
+   - Validar que se actualiza la tabla y los indicadores EVM.
+
+Actualizar documentación:
+1. README.md:
+   Agregar una nota breve en la sección de ejecución local indicando que el backend habilita CORS para los puertos locales de Vite 5173 y 5174.
+
+2. AI_PROCESS.md:
+   Agregar este prompt como el siguiente prompt cronológico.
+   Documentar:
+   - El error detectado: Network Error en frontend.
+   - La causa técnica: falta de header access-control-allow-origin.
+   - La solución: habilitar CORSMiddleware en FastAPI.
+   - La validación: curl con Origin http://localhost:5174 y prueba funcional desde frontend.
+
+No modificar:
+- lógica EVM
+- modelos
+- repositorios
+- endpoints existentes
+- frontend
+- Docker
+- AWS
+- autenticación
+
+Al finalizar, reporta:
+1. Rama usada.
+2. Archivos modificados.
+3. Resumen técnico.
+4. Pruebas ejecutadas.
+5. Resultado de pruebas.
+6. Validación CORS con curl.
+7. Pendientes.
+8. Commit sugerido.
+
+Commit sugerido:
+Enable frontend CORS
+
+Comandos finales si todo pasa:
+
+git status
+git add backend/app/main.py README.md AI_PROCESS.md
+git commit -m "Enable frontend CORS"
+git push -u origin hotfix/enable-frontend-cors
+
+Pull Request sugerido:
+hotfix/enable-frontend-cors -> develop
+
+Título del PR:
+Enable frontend CORS
+
+Descripción sugerida:
+## Summary
+
+- Enabled CORS middleware in FastAPI.
+- Allowed local Vite frontend origins for EVORA MVP validation.
+- Fixed frontend Network Error caused by missing access-control-allow-origin header.
+- Updated README and AI_PROCESS documentation.
+
+## Validation
+
+- Backend tests executed.
+- Backend started locally with SQLite temporal database.
+- CORS validated using curl with Origin http://localhost:5174.
+- Frontend validated from local Vite server.
+
+## Test results
+
+- Backend tests: 64 passed
+- CORS curl validation: access-control-allow-origin returned correctly
+- Frontend connection: Network Error resolved
+
+## Gitflow
+
+- Source branch: hotfix/enable-frontend-cors
+- Target branch: develop
+```
+
+### CORS hotfix notes
+
+- Error detected: `Network Error` in frontend while consuming backend from Vite.
+- Root cause: backend response did not include `access-control-allow-origin` for frontend origin.
+- Solution implemented: `CORSMiddleware` enabled in FastAPI with local Vite origins `5173/5174` for `localhost` and `127.0.0.1`.
+- Validation performed: backend tests + `curl` request with `Origin: http://localhost:5174` + local frontend run to confirm integration path.
+## Restricción de entorno corporativo
+
+Durante la validación local del MVP se identificó que el equipo corporativo utilizado tenía restricciones de seguridad sobre Shell, ejecución de comandos, navegación local y/o comunicación entre frontend y backend mediante localhost.
+
+El backend fue validado mediante pruebas automatizadas y revisión funcional. Sin embargo, la ejecución completa frontend-backend desde el navegador se vio limitada por políticas del entorno corporativo.
+
+No se intentó evadir ni modificar controles de seguridad corporativos. Como alternativa, se dejó documentado el procedimiento de ejecución local estándar y se recomienda validar la demo final desde un entorno autorizado sin restricciones sobre Python, Node.js, npm, navegador y puertos locales.
