@@ -1185,6 +1185,329 @@ Pull Request sugerido:
 Add project EVM summary endpoint
 ```
 
+### Prompt 6
+
+```text
+Usa la skill EVORA MVP Builder.
+
+Estamos en el proyecto EVORA, repositorio evora-evm-dashboard.
+
+Objetivo de esta tarea:
+Construir el frontend dashboard de EVORA conectado al backend existente, usando React, Vite, TypeScript, Tailwind CSS, Axios y Recharts.
+
+Rama esperada:
+feature/frontend-dashboard
+
+Antes de modificar archivos:
+1. Ejecuta git status.
+2. Ejecuta git branch.
+3. Confirma que estás en feature/frontend-dashboard.
+4. Si no estás en esa rama, indícalo y sugiere el comando correcto.
+5. No trabajes directamente sobre main ni develop.
+
+Contexto funcional:
+EVORA es una plataforma fullstack para seguimiento de proyectos con Valor Ganado. El backend ya tiene:
+- CRUD de proyectos.
+- CRUD de actividades.
+- Endpoint de resumen EVM consolidado por proyecto.
+- Servicio EvmCalculationService.
+- Swagger en /swagger-ui.
+- OpenAPI en /api-docs.json.
+
+El desafío técnico solicita un dashboard donde el líder de proyecto pueda ingresar y editar actividades, ver el resultado del análisis en tiempo real, revisar tabla de actividades con indicadores calculados, indicadores consolidados, indicación visual de CPI/SPI y gráfica comparativa PV, EV y AC por actividad.
+
+En esta tarea debes construir el dashboard frontend conectado al backend.
+
+No agregues:
+- AWS
+- EC2
+- Docker Compose nuevo
+- autenticación
+- roles
+- CI/CD
+- exportación PDF
+- exportación Excel
+- funcionalidades fuera del alcance del MVP
+
+Stack obligatorio:
+- React
+- Vite
+- TypeScript
+- Tailwind CSS
+- Axios
+- Recharts
+
+Archivos principales:
+- frontend/src/api/evoraApi.ts
+- frontend/src/types/evm.ts
+- frontend/src/pages/Dashboard.tsx
+- frontend/src/components/ProjectForm.tsx
+- frontend/src/components/ActivityForm.tsx
+- frontend/src/components/ActivityTable.tsx
+- frontend/src/components/IndicatorCard.tsx
+- frontend/src/components/StatusBadge.tsx
+- frontend/src/components/EvmChart.tsx
+- frontend/src/App.tsx
+- frontend/src/index.css
+- frontend/.env.example
+- README.md
+- AI_PROCESS.md
+
+API base:
+Usa variable de entorno:
+
+VITE_API_BASE_URL=http://localhost:8000
+
+Crear o ajustar:
+frontend/.env.example
+
+Con:
+
+VITE_API_BASE_URL=http://localhost:8000
+
+Crear cliente API:
+frontend/src/api/evoraApi.ts
+
+Debe incluir funciones:
+
+1. getProjects()
+2. createProject(payload)
+3. getProjectById(projectId)
+4. createActivity(projectId, payload)
+5. getActivitiesByProject(projectId)
+6. getProjectEvmSummary(projectId)
+
+Usa Axios.
+Centraliza la URL base.
+Maneja errores de forma limpia.
+
+Tipos TypeScript:
+Crear o ajustar:
+frontend/src/types/evm.ts
+
+Define interfaces:
+
+1. Project
+2. ProjectCreatePayload
+3. Activity
+4. ActivityCreatePayload
+5. ActivityEvmIndicators
+6. ActivityWithEvm
+7. ProjectEvmSummary
+8. ProjectEvmSummaryResponse
+
+Los tipos deben reflejar los responses del backend.
+
+Dashboard:
+Crear o ajustar:
+frontend/src/pages/Dashboard.tsx
+
+Debe:
+1. Cargar proyectos al iniciar.
+2. Permitir seleccionar un proyecto activo.
+3. Permitir crear un proyecto.
+4. Permitir crear actividades para el proyecto seleccionado.
+5. Consultar el resumen EVM del proyecto seleccionado.
+6. Mostrar tarjetas de indicadores consolidados.
+7. Mostrar tabla de actividades con indicadores EVM.
+8. Mostrar gráfica PV, EV y AC por actividad.
+9. Mostrar mensajes claros cuando no haya proyectos.
+10. Mostrar mensajes claros cuando un proyecto no tenga actividades.
+11. Mostrar estados de carga.
+12. Mostrar mensajes de error si falla la API.
+13. Refrescar el resumen después de crear una actividad.
+
+Componentes:
+
+1. ProjectForm
+Archivo:
+frontend/src/components/ProjectForm.tsx
+
+Debe permitir crear proyecto con:
+- name
+- description
+
+Debe validar:
+- name requerido
+- name no vacío
+
+2. ActivityForm
+Archivo:
+frontend/src/components/ActivityForm.tsx
+
+Debe permitir crear actividad con:
+- name
+- bac
+- planned_progress
+- actual_progress
+- actual_cost
+
+Debe validar:
+- name requerido
+- bac > 0
+- planned_progress entre 0 y 100
+- actual_progress entre 0 y 100
+- actual_cost >= 0
+
+3. IndicatorCard
+Archivo:
+frontend/src/components/IndicatorCard.tsx
+
+Debe mostrar:
+- label
+- value
+- optional status
+- optional helper text
+
+Usar formato claro para moneda e índices.
+
+4. StatusBadge
+Archivo:
+frontend/src/components/StatusBadge.tsx
+
+Debe mostrar estado visual para:
+- Eficiente en costos
+- En presupuesto
+- Sobre presupuesto
+- Adelantado
+- En cronograma
+- Atrasado
+- No calculable
+
+Usa clases Tailwind CSS.
+No uses librerías adicionales de UI.
+
+5. ActivityTable
+Archivo:
+frontend/src/components/ActivityTable.tsx
+
+Debe mostrar columnas:
+- Actividad
+- BAC
+- Avance planificado
+- Avance real
+- AC
+- PV
+- EV
+- CV
+- SV
+- CPI
+- SPI
+- EAC
+- VAC
+- Estado costo
+- Estado cronograma
+
+6. EvmChart
+Archivo:
+frontend/src/components/EvmChart.tsx
+
+Debe usar Recharts.
+Debe comparar por actividad:
+- PV
+- EV
+- AC
+
+Usa:
+- ResponsiveContainer
+- BarChart
+- Bar
+- XAxis
+- YAxis
+- Tooltip
+- Legend
+
+No uses colores complejos ni diseño excesivo.
+El objetivo es claridad.
+
+Diseño:
+Usa Tailwind CSS.
+Diseño profesional, simple y limpio.
+Debe tener:
+- Header con nombre EVORA.
+- Subtítulo: Plataforma inteligente para seguimiento de proyectos con Valor Ganado.
+- Sección de proyectos.
+- Sección de formularios.
+- Sección de indicadores.
+- Sección de tabla.
+- Sección de gráfica.
+
+No hagas diseño elaborado.
+La prioridad es que se entienda de un vistazo si el proyecto va bien o mal.
+
+Formato de valores:
+Crear funciones auxiliares si aplica:
+
+formatCurrency(value)
+formatNumber(value)
+formatPercentage(value)
+
+Reglas:
+1. Si un valor es null, mostrar "No calculable".
+2. Si un valor monetario existe, mostrarlo con separador de miles.
+3. Si CPI/SPI existe, mostrar dos decimales.
+4. Si no hay proyecto seleccionado, mostrar mensaje orientativo.
+5. Si no hay actividades, mostrar mensaje "Este proyecto aún no tiene actividades registradas".
+
+Pruebas/build:
+Ejecuta:
+
+cd frontend
+npm install
+npm run build
+
+Si existe lint configurado, ejecuta:
+
+npm run lint
+
+No rompas el backend.
+No modifiques lógica EVM del backend en esta tarea.
+No modifiques endpoints backend salvo que sea estrictamente necesario para corregir contrato, y si lo haces debes documentarlo.
+
+Actualiza README.md:
+Agrega una sección:
+
+## Frontend Dashboard
+
+Incluye:
+- ubicación del frontend
+- variable VITE_API_BASE_URL
+- comandos de instalación
+- comando de ejecución
+- comando de build
+- componentes principales
+- endpoints consumidos
+
+Actualiza AI_PROCESS.md:
+1. Agrega este prompt completo como el siguiente prompt cronológico.
+2. Documenta que se construyó el dashboard frontend.
+3. Documenta que el dashboard consume el backend real.
+4. Documenta que se usó Recharts para comparar PV, EV y AC.
+5. Documenta que se usaron badges visuales para CPI y SPI.
+6. Documenta que el diseño se mantuvo simple porque el requerimiento prioriza claridad.
+
+Al finalizar, reporta:
+1. Rama usada.
+2. Archivos creados.
+3. Archivos modificados.
+4. Resumen técnico.
+5. Componentes implementados.
+6. Endpoints consumidos.
+7. Comandos ejecutados.
+8. Resultado de build/lint.
+9. Documentación actualizada.
+10. AI_PROCESS actualizado.
+11. Pendientes.
+12. Commit sugerido.
+13. Pull Request sugerido.
+
+Commit sugerido:
+Create frontend EVM dashboard
+
+Pull Request sugerido:
+Create frontend EVM dashboard
+```
+
 ## How I learned EVM
 
 - Se implementaron las fórmulas base de Valor Ganado en `EvmCalculationService` para actividad y consolidado.
@@ -1192,6 +1515,7 @@ Add project EVM summary endpoint
 - Se implementó el CRUD de proyectos en API REST con prefijo versionado `/api/v1/projects`.
 - Se implementó el CRUD de actividades en API REST y cada respuesta incluye indicadores EVM por actividad.
 - Se implementó el endpoint consolidado `GET /api/v1/projects/{project_id}/evm-summary` para consumo del dashboard.
+- Se construyó el dashboard frontend en React + Vite + TypeScript conectado al backend real.
 
 ## How I validated formulas
 
@@ -1200,6 +1524,7 @@ Add project EVM summary endpoint
 - Se agregaron pruebas de integración para crear, listar, consultar, actualizar y eliminar proyectos, incluyendo validaciones 404 y 422.
 - Se agregaron pruebas de integración del CRUD de actividades para validar contrato, reglas 422 y cálculo EVM en respuesta.
 - Se agregaron pruebas de integración para validar cálculos consolidados, contrato de dashboard y manejo de proyecto sin actividades.
+- El dashboard consume endpoints reales de proyectos, actividades y resumen EVM consolidado para validación funcional end-to-end.
 
 ## AI suggestions I did not follow
 
@@ -1213,6 +1538,7 @@ Add project EVM summary endpoint
 - Se mantuvo la separación por capas (routes/schemas/repositories/models) y no se agregó lógica de base de datos dentro de routes.
 - La lógica EVM en actividades se reutilizó desde `EvmCalculationService` y no se duplicaron fórmulas en routes.
 - El endpoint consolidado reutiliza `EvmCalculationService` para cálculo por actividad y proyecto, sin duplicar fórmulas en la capa HTTP.
+- Se usó Recharts para comparar PV, EV y AC por actividad y badges visuales para estado de CPI/SPI, manteniendo diseño simple y orientado a claridad.
 
 ## Final reflection
 

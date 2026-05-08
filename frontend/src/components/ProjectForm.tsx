@@ -1,41 +1,80 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
+
+import { ProjectCreatePayload } from "../types/evm";
 
 interface ProjectFormProps {
-  onSubmit: (payload: { name: string; description: string }) => void;
+  onSubmit: (payload: ProjectCreatePayload) => Promise<void>;
+  isSubmitting: boolean;
 }
 
-export function ProjectForm({ onSubmit }: ProjectFormProps) {
+export function ProjectForm({ onSubmit, isSubmitting }: ProjectFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const normalizedName = name.trim();
+    if (!normalizedName) {
+      setError("El nombre del proyecto es obligatorio.");
+      return;
+    }
+
+    setError(null);
+    await onSubmit({
+      name: normalizedName,
+      description: description.trim() ? description.trim() : null,
+    });
+
+    setName("");
+    setDescription("");
+  };
 
   return (
-    <form
-      className="rounded-lg bg-white p-4 shadow"
-      onSubmit={(event) => {
-        event.preventDefault();
-        onSubmit({ name, description });
-      }}
-    >
-      <h2 className="mb-3 text-lg font-semibold">Proyecto</h2>
-      <div className="grid gap-3 md:grid-cols-2">
-        <input
-          className="rounded border border-gray-300 px-3 py-2"
-          placeholder="Nombre del proyecto"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-        <input
-          className="rounded border border-gray-300 px-3 py-2"
-          placeholder="Descripcion"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-        />
+    <form onSubmit={handleSubmit} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <h2 className="text-lg font-semibold text-slate-900">Crear proyecto</h2>
+      <p className="mt-1 text-sm text-slate-500">Registra un proyecto para iniciar el análisis EVM.</p>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="project-name">
+            Nombre
+          </label>
+          <input
+            id="project-name"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Implementación EVORA"
+          />
+        </div>
+
+        <div>
+          <label
+            className="mb-1 block text-sm font-medium text-slate-700"
+            htmlFor="project-description"
+          >
+            Descripción
+          </label>
+          <input
+            id="project-description"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Opcional"
+          />
+        </div>
       </div>
+
+      {error ? <p className="mt-2 text-sm text-rose-600">{error}</p> : null}
+
       <button
         type="submit"
-        className="mt-3 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white"
+        disabled={isSubmitting}
+        className="mt-4 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
       >
-        Guardar proyecto
+        {isSubmitting ? "Guardando..." : "Guardar proyecto"}
       </button>
     </form>
   );

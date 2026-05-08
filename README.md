@@ -89,6 +89,42 @@ cd frontend
 npm run dev
 ```
 
+## Frontend Dashboard
+
+- Ubicacion: `frontend/`
+- Variable de entorno:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+- Comandos:
+
+```bash
+cd frontend
+npm install
+npm run dev
+npm run build
+npm run lint
+```
+
+- Componentes principales:
+  - `ProjectForm`
+  - `ActivityForm`
+  - `IndicatorCard`
+  - `StatusBadge`
+  - `ActivityTable`
+  - `EvmChart`
+  - `Dashboard`
+
+- Endpoints consumidos:
+  - `GET /api/v1/projects`
+  - `POST /api/v1/projects`
+  - `GET /api/v1/projects/{project_id}`
+  - `POST /api/v1/projects/{project_id}/activities`
+  - `GET /api/v1/projects/{project_id}/activities`
+  - `GET /api/v1/projects/{project_id}/evm-summary`
+
 ## Pruebas backend
 
 ```bash
