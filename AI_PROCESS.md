@@ -445,15 +445,213 @@ Commit sugerido:
 Add EVM calculation service
 ```
 
+### Prompt 3
+
+```text
+Usa la skill EVORA MVP Builder.
+
+Estamos en el proyecto EVORA, repositorio evora-evm-dashboard.
+
+Objetivo de esta tarea:
+Implementar el CRUD backend para proyectos usando FastAPI, SQLAlchemy, Pydantic y arquitectura por capas.
+
+Rama esperada:
+feature/backend-project-crud
+
+Antes de modificar archivos:
+1. Ejecuta git status.
+2. Ejecuta git branch.
+3. Confirma que estás en feature/backend-project-crud.
+4. Si no estás en esa rama, indícalo y sugiere el comando correcto.
+5. No trabajes directamente sobre main ni develop.
+
+Contexto:
+El desafío técnico solicita una API REST para gestionar proyectos y actividades. En esta tarea solo debes implementar el CRUD de proyectos. No implementes todavía CRUD de actividades ni frontend.
+
+Endpoints requeridos:
+
+POST /api/v1/projects
+GET /api/v1/projects
+GET /api/v1/projects/{project_id}
+PUT /api/v1/projects/{project_id}
+DELETE /api/v1/projects/{project_id}
+
+Arquitectura obligatoria:
+- Las rutas deben vivir en backend/app/routes/project_routes.py.
+- Los schemas deben vivir en backend/app/schemas/project_schema.py.
+- El modelo SQLAlchemy debe vivir en backend/app/models/project.py.
+- La lógica de acceso a datos debe vivir en backend/app/repositories/project_repository.py.
+- No pongas lógica de base de datos directamente en routes.
+- No pongas lógica de negocio dentro de routes.
+- Mantén nombres técnicos en inglés.
+- Mantén documentación y mensajes explicativos en español cuando aplique.
+
+Modelo Project:
+Debe tener como mínimo:
+
+- id: UUID, primary key
+- name: string, obligatorio, máximo 150 caracteres
+- description: string opcional
+- created_at: datetime
+- updated_at: datetime
+
+Reglas:
+1. El nombre del proyecto es obligatorio.
+2. El nombre no debe estar vacío.
+3. La descripción es opcional.
+4. Si el proyecto no existe, retornar HTTP 404.
+5. Si el request es inválido, retornar HTTP 422.
+6. DELETE debe retornar HTTP 204 si elimina correctamente.
+7. No uses datos sensibles reales.
+8. No quemes credenciales.
+9. No agregues autenticación.
+10. No agregues roles.
+11. No agregues AWS, EC2 ni configuración cloud.
+12. No agregues Docker Compose nuevo en esta tarea.
+
+Schemas Pydantic requeridos:
+Crear o ajustar en backend/app/schemas/project_schema.py:
+
+1. ProjectBase
+2. ProjectCreate
+3. ProjectUpdate
+4. ProjectResponse
+
+ProjectCreate:
+- name requerido
+- description opcional
+
+ProjectUpdate:
+- name opcional
+- description opcional
+
+ProjectResponse:
+- id
+- name
+- description
+- created_at
+- updated_at
+
+Repository:
+Crear o ajustar en backend/app/repositories/project_repository.py métodos claros:
+
+1. create_project
+2. get_projects
+3. get_project_by_id
+4. update_project
+5. delete_project
+
+Routes:
+Crear o ajustar en backend/app/routes/project_routes.py:
+
+1. POST /api/v1/projects
+2. GET /api/v1/projects
+3. GET /api/v1/projects/{project_id}
+4. PUT /api/v1/projects/{project_id}
+5. DELETE /api/v1/projects/{project_id}
+
+Cada endpoint debe incluir:
+1. response_model.
+2. status_code cuando aplique.
+3. descripción clara para Swagger.
+4. manejo de 404 cuando el proyecto no exista.
+5. uso de Depends para obtener sesión de base de datos.
+
+Main:
+Asegura que backend/app/main.py incluya el router de proyectos.
+
+Swagger:
+Debe seguir disponible en:
+- /swagger-ui
+
+OpenAPI:
+Debe seguir disponible en:
+- /api-docs.json
+
+Pruebas de integración:
+Crear o ajustar:
+backend/tests/integration/test_project_endpoints.py
+
+Debe incluir pruebas para:
+
+1. create project successfully.
+2. list projects successfully.
+3. get project by id successfully.
+4. return 404 when project does not exist.
+5. update project successfully.
+6. delete project successfully.
+7. validate project name is required.
+
+Las pruebas deben validar:
+- status code.
+- estructura del response.
+- campos principales.
+- comportamiento 404.
+- comportamiento 422.
+
+No crees pruebas vacías.
+No crees pruebas que solo validen que algo retorna algo.
+Las pruebas deben validar contrato real de API.
+
+Si el proyecto todavía no tiene configuración completa de base de datos para tests, crea una configuración mínima y limpia para pruebas usando SQLite en memoria solo para testing, sin afectar PostgreSQL como base objetivo del proyecto.
+
+Actualiza README.md:
+Agrega una sección breve:
+
+## Project CRUD API
+
+Incluye:
+- endpoints disponibles
+- cómo ejecutar pruebas de integración de proyectos
+- ruta Swagger
+
+Actualiza AI_PROCESS.md:
+1. Agrega este prompt completo como el siguiente prompt cronológico.
+2. Documenta que se implementó el CRUD de proyectos.
+3. Documenta que se mantuvo separación por capas.
+4. Documenta que no se agregó lógica de base de datos en routes.
+
+Ejecuta pruebas:
+
+cd backend
+pytest tests/integration/test_project_endpoints.py
+
+Si hay pruebas unitarias existentes del servicio EVM, también ejecuta:
+
+pytest
+
+Al finalizar, reporta:
+1. Rama usada.
+2. Archivos creados.
+3. Archivos modificados.
+4. Resumen técnico.
+5. Endpoints implementados.
+6. Pruebas ejecutadas.
+7. Resultado de pruebas.
+8. Documentación actualizada.
+9. AI_PROCESS actualizado.
+10. Pendientes.
+11. Commit sugerido.
+12. Pull Request sugerido.
+
+Commit sugerido:
+Create project CRUD endpoints
+
+Pull Request sugerido:
+Create project CRUD endpoints
+```
+
 ## How I learned EVM
 
 - Se implementaron las fórmulas base de Valor Ganado en `EvmCalculationService` para actividad y consolidado.
 - Se reforzó la diferencia entre métricas por actividad y métricas consolidadas calculadas sobre totales del proyecto.
+- Se implementó el CRUD de proyectos en API REST con prefijo versionado `/api/v1/projects`.
 
 ## How I validated formulas
 
 - Se diseñaron pruebas unitarias con valores controlados para PV, EV, CV, SV, CPI, SPI, EAC y VAC.
 - Se incluyeron casos borde para división por cero, progreso real en cero, BAC en cero y proyecto sin actividades.
+- Se agregaron pruebas de integración para crear, listar, consultar, actualizar y eliminar proyectos, incluyendo validaciones 404 y 422.
 
 ## AI suggestions I did not follow
 
@@ -464,6 +662,7 @@ Add EVM calculation service
 
 - En el consolidado de proyecto no se promedian CPI ni SPI por actividad; se calcula sobre sumatorias de BAC, PV, EV y AC.
 - Cuando CPI o SPI no son calculables, se retorna `None` para el indicador correspondiente y estado textual `"No calculable"`.
+- Se mantuvo la separación por capas (routes/schemas/repositories/models) y no se agregó lógica de base de datos dentro de routes.
 
 ## Final reflection
 

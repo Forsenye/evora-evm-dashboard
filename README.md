@@ -97,6 +97,27 @@ cd backend
 pytest
 ```
 
+## Project CRUD API
+
+Endpoints disponibles:
+
+- `POST /api/v1/projects`
+- `GET /api/v1/projects`
+- `GET /api/v1/projects/{project_id}`
+- `PUT /api/v1/projects/{project_id}`
+- `DELETE /api/v1/projects/{project_id}`
+
+Pruebas de integración de proyectos:
+
+```bash
+cd backend
+pytest tests/integration/test_project_endpoints.py
+```
+
+Swagger:
+
+- `http://localhost:8000/swagger-ui`
+
 ## EVM Calculation Service
 
 - Ubicacion del servicio: `backend/app/services/evm_calculation_service.py`
