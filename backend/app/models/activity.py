@@ -22,7 +22,7 @@ class Activity(Base):
         ForeignKey("projects.id", ondelete="CASCADE"),
         nullable=False,
     )
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
     bac: Mapped[float] = mapped_column(Float, nullable=False)
     planned_progress: Mapped[float] = mapped_column(Float, nullable=False)
     actual_progress: Mapped[float] = mapped_column(Float, nullable=False)

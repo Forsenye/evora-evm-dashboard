@@ -118,6 +118,35 @@ Swagger:
 
 - `http://localhost:8000/swagger-ui`
 
+## Activity CRUD API
+
+Endpoints disponibles:
+
+- `POST /api/v1/projects/{project_id}/activities`
+- `GET /api/v1/projects/{project_id}/activities`
+- `GET /api/v1/activities/{activity_id}`
+- `PUT /api/v1/activities/{activity_id}`
+- `DELETE /api/v1/activities/{activity_id}`
+
+Datos requeridos para crear actividades:
+
+- `name` (string, requerido, maximo 150)
+- `bac` (numero, requerido, mayor que 0)
+- `planned_progress` (numero, requerido, entre 0 y 100)
+- `actual_progress` (numero, requerido, entre 0 y 100)
+- `actual_cost` (numero, requerido, mayor o igual que 0)
+
+Pruebas de integración de actividades:
+
+```bash
+cd backend
+pytest tests/integration/test_activity_endpoints.py
+```
+
+Swagger:
+
+- `http://localhost:8000/swagger-ui`
+
 ## EVM Calculation Service
 
 - Ubicacion del servicio: `backend/app/services/evm_calculation_service.py`

@@ -641,17 +641,288 @@ Pull Request sugerido:
 Create project CRUD endpoints
 ```
 
+### Prompt 4
+
+```text
+Usa la skill EVORA MVP Builder.
+
+Estamos en el proyecto EVORA, repositorio evora-evm-dashboard.
+
+Objetivo de esta tarea:
+Implementar el CRUD backend para actividades asociadas a proyectos usando FastAPI, SQLAlchemy, Pydantic, arquitectura por capas y el servicio EvmCalculationService ya existente.
+
+Rama esperada:
+feature/backend-activity-crud
+
+Antes de modificar archivos:
+1. Ejecuta git status.
+2. Ejecuta git branch.
+3. Confirma que estás en feature/backend-activity-crud.
+4. Si no estás en esa rama, indícalo y sugiere el comando correcto.
+5. No trabajes directamente sobre main ni develop.
+
+Contexto funcional:
+El desafío técnico solicita que cada actividad registre:
+- Nombre
+- BAC, Budget at Completion
+- Porcentaje de avance planificado a la fecha de corte
+- Porcentaje de avance real completado
+- AC, Actual Cost
+
+Con estos datos, el sistema debe calcular:
+- PV
+- EV
+- CV
+- SV
+- CPI
+- SPI
+- EAC
+- VAC
+
+En esta tarea solo debes implementar CRUD de actividades y asegurar que las respuestas incluyan indicadores EVM por actividad. No implementes frontend ni resumen consolidado del proyecto en esta tarea, salvo que ya exista una función reusable.
+
+Endpoints requeridos:
+
+POST /api/v1/projects/{project_id}/activities
+GET /api/v1/projects/{project_id}/activities
+GET /api/v1/activities/{activity_id}
+PUT /api/v1/activities/{activity_id}
+DELETE /api/v1/activities/{activity_id}
+
+Arquitectura obligatoria:
+- Las rutas deben vivir en backend/app/routes/activity_routes.py.
+- Los schemas deben vivir en backend/app/schemas/activity_schema.py.
+- El modelo SQLAlchemy debe vivir en backend/app/models/activity.py.
+- La lógica de acceso a datos debe vivir en backend/app/repositories/activity_repository.py.
+- Los cálculos EVM deben usar EvmCalculationService.
+- No pongas lógica de base de datos directamente en routes.
+- No pongas fórmulas EVM dentro de routes.
+- No pongas lógica EVM en schemas ni modelos.
+- Mantén nombres técnicos en inglés.
+- Mantén documentación y mensajes explicativos en español cuando aplique.
+
+Modelo Activity:
+Debe tener como mínimo:
+
+- id: UUID, primary key
+- project_id: UUID, foreign key hacia projects.id
+- name: string, obligatorio, máximo 150 caracteres
+- bac: numeric/float/decimal, obligatorio, mayor que 0
+- planned_progress: numeric/float/decimal, obligatorio, entre 0 y 100
+- actual_progress: numeric/float/decimal, obligatorio, entre 0 y 100
+- actual_cost: numeric/float/decimal, obligatorio, mayor o igual que 0
+- created_at: datetime
+- updated_at: datetime
+
+Relación:
+- Una actividad pertenece a un proyecto.
+- Un proyecto puede tener muchas actividades.
+- Si se elimina un proyecto, sus actividades deben eliminarse por cascade si la base de datos/modelo lo permite.
+
+Reglas de validación:
+1. El nombre de la actividad es obligatorio.
+2. El nombre no debe estar vacío.
+3. BAC debe ser mayor que 0.
+4. planned_progress debe estar entre 0 y 100.
+5. actual_progress debe estar entre 0 y 100.
+6. actual_cost debe ser mayor o igual que 0.
+7. Si el proyecto no existe al crear una actividad, retornar HTTP 404.
+8. Si la actividad no existe, retornar HTTP 404.
+9. Si el request es inválido, retornar HTTP 422.
+10. DELETE debe retornar HTTP 204 si elimina correctamente.
+
+Schemas Pydantic requeridos:
+Crear o ajustar en backend/app/schemas/activity_schema.py:
+
+1. ActivityBase
+2. ActivityCreate
+3. ActivityUpdate
+4. ActivityResponse
+5. ActivityWithEvmResponse
+
+ActivityCreate:
+- name requerido
+- bac requerido
+- planned_progress requerido
+- actual_progress requerido
+- actual_cost requerido
+
+ActivityUpdate:
+- name opcional
+- bac opcional
+- planned_progress opcional
+- actual_progress opcional
+- actual_cost opcional
+
+ActivityResponse:
+- id
+- project_id
+- name
+- bac
+- planned_progress
+- actual_progress
+- actual_cost
+- created_at
+- updated_at
+
+ActivityWithEvmResponse:
+Debe incluir los campos de ActivityResponse y un objeto evm con:
+- pv
+- ev
+- cv
+- sv
+- cpi
+- spi
+- eac
+- vac
+- cost_status
+- schedule_status
+
+Repository:
+Crear o ajustar en backend/app/repositories/activity_repository.py métodos claros:
+
+1. create_activity
+2. get_activities_by_project
+3. get_activity_by_id
+4. update_activity
+5. delete_activity
+
+Routes:
+Crear o ajustar en backend/app/routes/activity_routes.py:
+
+1. POST /api/v1/projects/{project_id}/activities
+2. GET /api/v1/projects/{project_id}/activities
+3. GET /api/v1/activities/{activity_id}
+4. PUT /api/v1/activities/{activity_id}
+5. DELETE /api/v1/activities/{activity_id}
+
+Cada endpoint debe incluir:
+1. response_model.
+2. status_code cuando aplique.
+3. descripción clara para Swagger.
+4. manejo de 404 cuando el proyecto o actividad no exista.
+5. uso de Depends para obtener sesión de base de datos.
+6. uso de EvmCalculationService para anexar indicadores EVM a las respuestas.
+
+Main:
+Asegura que backend/app/main.py incluya el router de actividades.
+
+Swagger:
+Debe seguir disponible en:
+- /swagger-ui
+
+OpenAPI:
+Debe seguir disponible en:
+- /api-docs.json
+
+Pruebas de integración:
+Crear o ajustar:
+backend/tests/integration/test_activity_endpoints.py
+
+Debe incluir pruebas para:
+
+1. create activity successfully.
+2. return 404 when creating activity for non-existing project.
+3. list activities by project successfully.
+4. get activity by id successfully.
+5. return 404 when activity does not exist.
+6. update activity successfully.
+7. delete activity successfully.
+8. validate activity name is required.
+9. validate BAC must be greater than zero.
+10. validate planned_progress cannot be lower than 0.
+11. validate planned_progress cannot be greater than 100.
+12. validate actual_progress cannot be lower than 0.
+13. validate actual_progress cannot be greater than 100.
+14. validate actual_cost cannot be negative.
+15. verify activity response includes EVM indicators.
+16. verify CPI is None when actual_cost is zero.
+17. verify SPI is None when planned_progress is zero.
+
+Las pruebas deben validar:
+- status code.
+- estructura del response.
+- campos principales.
+- indicadores EVM.
+- comportamiento 404.
+- comportamiento 422.
+
+No crees pruebas vacías.
+No crees pruebas que solo validen que algo retorna algo.
+Las pruebas deben validar contrato real de API y cálculos reales.
+
+Si el proyecto usa SQLite en memoria para tests, reutiliza esa configuración sin afectar PostgreSQL como base objetivo.
+
+No agregues:
+- AWS
+- EC2
+- Docker Compose nuevo
+- autenticación
+- roles
+- frontend
+- resumen consolidado si no es necesario para esta tarea
+
+Actualiza README.md:
+Agrega una sección breve:
+
+## Activity CRUD API
+
+Incluye:
+- endpoints disponibles
+- datos requeridos para crear actividades
+- cómo ejecutar pruebas de integración de actividades
+- ruta Swagger
+
+Actualiza AI_PROCESS.md:
+1. Agrega este prompt completo como el siguiente prompt cronológico.
+2. Documenta que se implementó el CRUD de actividades.
+3. Documenta que las respuestas de actividades incluyen indicadores EVM.
+4. Documenta que se mantuvo separación por capas.
+5. Documenta que la lógica EVM se reutilizó desde EvmCalculationService y no se duplicó en routes.
+
+Ejecuta pruebas:
+
+cd backend
+pytest tests/integration/test_activity_endpoints.py
+
+También ejecuta:
+
+pytest
+
+Al finalizar, reporta:
+1. Rama usada.
+2. Archivos creados.
+3. Archivos modificados.
+4. Resumen técnico.
+5. Endpoints implementados.
+6. Pruebas ejecutadas.
+7. Resultado de pruebas.
+8. Documentación actualizada.
+9. AI_PROCESS actualizado.
+10. Pendientes.
+11. Commit sugerido.
+12. Pull Request sugerido.
+
+Commit sugerido:
+Create activity CRUD endpoints
+
+Pull Request sugerido:
+Create activity CRUD endpoints
+```
+
 ## How I learned EVM
 
 - Se implementaron las fórmulas base de Valor Ganado en `EvmCalculationService` para actividad y consolidado.
 - Se reforzó la diferencia entre métricas por actividad y métricas consolidadas calculadas sobre totales del proyecto.
 - Se implementó el CRUD de proyectos en API REST con prefijo versionado `/api/v1/projects`.
+- Se implementó el CRUD de actividades en API REST y cada respuesta incluye indicadores EVM por actividad.
 
 ## How I validated formulas
 
 - Se diseñaron pruebas unitarias con valores controlados para PV, EV, CV, SV, CPI, SPI, EAC y VAC.
 - Se incluyeron casos borde para división por cero, progreso real en cero, BAC en cero y proyecto sin actividades.
 - Se agregaron pruebas de integración para crear, listar, consultar, actualizar y eliminar proyectos, incluyendo validaciones 404 y 422.
+- Se agregaron pruebas de integración del CRUD de actividades para validar contrato, reglas 422 y cálculo EVM en respuesta.
 
 ## AI suggestions I did not follow
 
@@ -663,6 +934,7 @@ Create project CRUD endpoints
 - En el consolidado de proyecto no se promedian CPI ni SPI por actividad; se calcula sobre sumatorias de BAC, PV, EV y AC.
 - Cuando CPI o SPI no son calculables, se retorna `None` para el indicador correspondiente y estado textual `"No calculable"`.
 - Se mantuvo la separación por capas (routes/schemas/repositories/models) y no se agregó lógica de base de datos dentro de routes.
+- La lógica EVM en actividades se reutilizó desde `EvmCalculationService` y no se duplicaron fórmulas en routes.
 
 ## Final reflection
 

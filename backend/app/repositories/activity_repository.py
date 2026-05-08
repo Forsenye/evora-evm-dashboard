@@ -11,7 +11,7 @@ class ActivityRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def list_by_project(self, project_id: uuid.UUID) -> list[Activity]:
+    def get_activities_by_project(self, project_id: uuid.UUID) -> list[Activity]:
         statement = (
             select(Activity)
             .where(Activity.project_id == project_id)
@@ -19,7 +19,7 @@ class ActivityRepository:
         )
         return list(self.db.scalars(statement).all())
 
-    def get_activity(self, activity_id: uuid.UUID) -> Activity | None:
+    def get_activity_by_id(self, activity_id: uuid.UUID) -> Activity | None:
         statement = select(Activity).where(Activity.id == activity_id)
         return self.db.scalars(statement).first()
 
@@ -41,3 +41,10 @@ class ActivityRepository:
     def delete_activity(self, activity: Activity) -> None:
         self.db.delete(activity)
         self.db.commit()
+
+    # Backward-compatible aliases for existing code paths.
+    def list_by_project(self, project_id: uuid.UUID) -> list[Activity]:
+        return self.get_activities_by_project(project_id)
+
+    def get_activity(self, activity_id: uuid.UUID) -> Activity | None:
+        return self.get_activity_by_id(activity_id)
